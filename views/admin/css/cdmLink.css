@@ -86,9 +86,8 @@ display:block;
 }
 .cdm-link #preview-list li img {
     height:62px;
-    width:62px;
     vertical-align:middle;
-    max-width:100px;
+    max-width:200px;
 }
 
 .cdm-link #preview-list {
