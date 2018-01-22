@@ -200,6 +200,7 @@ function cdm_get_item_meta($collection,$pointer,$all=false,$fields = false,$fiel
     }
     $meta['Transcript'][]= cdm_get_transcript($collection,$pointer);
     $meta['Relation'][]= cdm_get_public_url($collection,$pointer);
+    $meta['URL'][]= cdm_get_public_url($collection,$pointer);
     return $meta;
 }
 
@@ -455,6 +456,8 @@ function cdm_get_file_url($collection,$pointer,$filename=false) {
         $width = $vals[$index['WIDTH'][0]]['value'];
         $height = $vals[$index['HEIGHT'][0]]['value'];
         $maxWidth = get_option('cdmMaxWidth');
+        
+//        this code block for scaling only works for jp2
         /*if($width > $maxWidth || strpos($vals[$index['FILENAME'][0]]['value'],'jp2')) {
             if(get_option('cdmLimitImageSize'))
                 $scale = $width > $maxWidth ? floor($maxWidth/$width) : 1;
@@ -465,12 +468,8 @@ function cdm_get_file_url($collection,$pointer,$filename=false) {
             return $url;
         }*/
         
-    /*    $url = get_option('cdmWebsiteUrl');
-            $url .= '/utils/ajaxhelper/?CISOROOT='.$collection.'&CISOPTR='.$pointer.'&action=2&DMWIDTH='.floor($width).'&DMHEIGHT='.floor($height);
-            return $url;*/
     }
-
-// This block of code does not work with the server for HVVACC    
+   
     $filename = $filename ? $filename : 'cdm_'.rand();
     $url = get_option('cdmWebsiteUrl');
     $url .= '/utils/getfile/collection'.$collection;
