@@ -200,7 +200,8 @@ function cdm_get_item_meta($collection,$pointer,$all=false,$fields = false,$fiel
     }
     $meta['Transcript'][]= cdm_get_transcript($collection,$pointer);
     $meta['Relation'][]= cdm_get_public_url($collection,$pointer);
-    $meta['URL'][]= cdm_get_public_url($collection,$pointer);
+    $meta['URL'][]= 
+    cdm_get_public_url($collection,$pointer);
     return $meta;
 }
 
@@ -518,7 +519,16 @@ function cdm_add_meta_and_files($item,$collection,$pointer) {
             $item->item_type_id = is_object($documentType) ? $documentType->id : null;
             $item->save();
 
-        }else {
+        }
+        if($field==='URL'){
+            $elementSet = 'Item Type Metadata';
+            $field = 'URL';
+            $documentType = get_db()->getTable('ItemType')->findByName('Still Image');
+            $item->item_type_id = is_object($documentType) ? $documentType->id : null;
+            $item->save();
+
+        }
+        else {
             $elementSet = 'Dublin Core';
         }
 
