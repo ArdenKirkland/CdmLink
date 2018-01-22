@@ -455,7 +455,7 @@ function cdm_get_file_url($collection,$pointer,$filename=false) {
         $width = $vals[$index['WIDTH'][0]]['value'];
         $height = $vals[$index['HEIGHT'][0]]['value'];
         $maxWidth = get_option('cdmMaxWidth');
-        if($width > $maxWidth || strpos($vals[$index['FILENAME'][0]]['value'],'jp2')) {
+        if($width > $maxWidth || strpos($vals[$index['FILENAME'][0]]['value'],'jpg')) {
             if(get_option('cdmLimitImageSize'))
                 $scale = $width > $maxWidth ? floor($maxWidth/$width) : 1;
             $height = $scale * $height;
@@ -464,8 +464,13 @@ function cdm_get_file_url($collection,$pointer,$filename=false) {
             $url .= '/utils/ajaxhelper/?CISOROOT='.$collection.'&CISOPTR='.$pointer.'&action=2&DMX=0&DMY=0&DMWIDTH='.floor($width).'&DMSCALE='.floor($scale*100).'&DMHEIGHT='.floor($height);
             return $url;
         }
+        
+    /*    $url = get_option('cdmWebsiteUrl');
+            $url .= '/utils/ajaxhelper/?CISOROOT='.$collection.'&CISOPTR='.$pointer.'&action=2&DMWIDTH='.floor($width).'&DMHEIGHT='.floor($height);
+            return $url;*/
     }
-    
+
+// This block of code does not work with the server for HVVACC    
     $filename = $filename ? $filename : 'cdm_'.rand();
     $url = get_option('cdmWebsiteUrl');
     $url .= '/utils/getfile/collection'.$collection;
@@ -473,6 +478,7 @@ function cdm_get_file_url($collection,$pointer,$filename=false) {
     $url .= '/filename/'.$filename;
     return $url;
 }
+
 
 function cdm_sync_item($collection,$pointer,$item_id) {
     $item = get_record_by_id('Item',$item_id);
