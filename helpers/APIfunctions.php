@@ -1,5 +1,4 @@
 <?php
-
 function cdm_search($collection,$terms,$maxrecs = false) 
 {
     $searchStrings = '';
@@ -56,7 +55,6 @@ function cdm_search($collection,$terms,$maxrecs = false)
         return false;
     $records = $response['records'];
     $results = array();
-
     foreach($records as $record) {
         $results[] = array(
             'title'=>$record['title'],
@@ -68,16 +66,13 @@ function cdm_search($collection,$terms,$maxrecs = false)
     }
     return $results;
 }
-
 function cdm_get_all_records($collection) {
-
     $start = 1;
     $total = 2; //dummy value greater than $start
     $maxrecs='1024';
     
     $cdmUrlBase = get_option('cdmServerUrl');
     $results = array();
-
     $i=0;
     while($start < $total) {
       set_time_limit(30);
@@ -99,7 +94,6 @@ function cdm_get_all_records($collection) {
     }
     return $results;
 }
-
 function cdm_get_collections($label="All Collections",$slug="/all") 
 {
 /*
@@ -119,7 +113,6 @@ https://server16019.contentdm.oclc.org/dmwebservices/index.php?q=dmGetCollection
         $options[$collection['alias']]=$collection['name'];
     return $options;    
 }
-
 function cdm_child_descend($node,$pages=false) {
     if(!is_array($pages) )
         $pages = array();
@@ -140,11 +133,8 @@ function cdm_child_descend($node,$pages=false) {
     }
     return $pages;
 }
-
 function cdm_get_public_url($collection,$id) {
-
     return $url = get_option('cdmWebsiteUrl').'/cdm/singleitem/collection'.$collection.'/id/'.$id;
-
 /*    $url = get_option('cdmServerUrl');
     $url .= '/dmwebservices/index.php?q=dmGetItemUrl'.$collection.'/'.$find.'/json';
     echo $url;
@@ -153,7 +143,6 @@ function cdm_get_public_url($collection,$id) {
     return $urlInfo['URL'];
 */
 }
-
 function cdm_get_child_pages($collection,$pointer)
 {
     $url = get_option('cdmServerUrl');
@@ -164,7 +153,6 @@ function cdm_get_child_pages($collection,$pointer)
     $pages = cdm_child_descend($objectMeta,array());
     return $pages;
 }
-
 function cdm_get_transcript($collection,$pointer) 
 {
     $pages = cdm_get_child_pages($collection,$pointer);
@@ -181,7 +169,6 @@ function cdm_get_transcript($collection,$pointer)
     }
     return $transcript ? $transcript : false;
 }
-
 function cdm_get_item_meta($collection,$pointer,$all=false,$fields = false,$fieldmap = false)
 {
     $rawMeta = cdm_get_raw_item_meta($collection,$pointer);
@@ -200,10 +187,10 @@ function cdm_get_item_meta($collection,$pointer,$all=false,$fields = false,$fiel
     }
     $meta['Transcript'][]= cdm_get_transcript($collection,$pointer);
     $meta['Relation'][]= cdm_get_public_url($collection,$pointer);
-    $meta['URL'][]= cdm_get_public_url($collection,$pointer);
+    $meta['URL'][]= 
+    cdm_get_public_url($collection,$pointer);
     return $meta;
 }
-
 function cdm_get_raw_item_meta($collection,$pointer)
 {
     $url = get_option('cdmServerUrl');
@@ -211,7 +198,6 @@ function cdm_get_raw_item_meta($collection,$pointer)
     $rawMeta = json_decode(file_get_contents($url),true);
     return $rawMeta;
 }
-
 /**
  *  outputCSV creates a line of CSV and outputs it to browser    
  */
@@ -229,14 +215,12 @@ function getCSV($array) {
     outputCSV($array);
     return ob_get_clean(); // ... then return it as a string!
 }
-
 function cdm_get_modified($collection,$pointer) {
     $url = get_option('cdmServerUrl');
     $url .= '/dmwebservices/index.php?q=GetItemDmmodified'.$collection.'/'.$pointer.'/json';
     $response = json_decode(file_get_contents($url),true);
     return $response[0];
 }
-
 function cdm_download_file($url,$filename) {
     $filename = sys_get_temp_dir().DIRECTORY_SEPARATOR.$filename;
     set_time_limit(30);
@@ -257,7 +241,6 @@ function cdm_download_file($url,$filename) {
     fclose($file);
     return $filename;
 }
-
 function cdm_concat_images($urls,$name=false) {
     $filename = sys_get_temp_dir().DIRECTORY_SEPARATOR.$name."_pages.pdf";
     $filestring = "";
@@ -272,21 +255,17 @@ function cdm_concat_images($urls,$name=false) {
     }
     if(empty($files)||count($files)<2)
         return false;
-
     $name = $name ? $name : 'cdm_'.rand();
     $command = "convert$filestring ".$filename;
     set_time_limit(30);
     //execute convert command to create pdf
     exec($command);
-
     //delete temp files
     foreach($files as $file)
         unlink($file);
-
     //return pdf filename
     return $filename;
 }
-
 function cdm_concat_pdfs($urls,$name=false) {
     $filename = sys_get_temp_dir().DIRECTORY_SEPARATOR.$name."_docs.pdf";
     $filestring = "";
@@ -301,21 +280,17 @@ function cdm_concat_pdfs($urls,$name=false) {
     }
     if(empty($files)||count($files)<2)
         return false;
-
     $name = $name ? $name : 'cdm_'.rand();
     $command = "convert$filestring ".$filename;
     set_time_limit(30);
     //execute convert command to create pdf
     exec($command);
-
     //delete temp files
     foreach($files as $file)
         unlink($file);
-
     //return pdf filename
     return $filename;
 }
-
 function cdm_get_nonimages($files) {
     $nonImages = array();
     foreach($files as $name=>$file) 
@@ -323,7 +298,6 @@ function cdm_get_nonimages($files) {
             $nonImages[$name] = $file;
     return $nonImages;
 }
-
 function cdm_get_nonpdfs($files) {
     $nonPdfs = array();
     foreach($files as $name=>$file) 
@@ -331,7 +305,6 @@ function cdm_get_nonpdfs($files) {
             $nonPdfs[$name] = $file;
     return $nonPdfs;
 }
-
 function cdm_is_image($collection,$pointer,$filename = false)
 {
     $childPages = cdm_get_child_pages($collection,$pointer);
@@ -362,19 +335,15 @@ function cdm_is_image($collection,$pointer,$filename = false)
     }
     return false;
 }
-
-
 function cdm_get_item_files($collection,$pointer,$filename = false)
 {
 //    $filename = $filename ? $filename : $pointer;
     $urls = array();
-
     if($filename) {
         $mainUrl = cdm_get_file_url($collection,$pointer,$filename);
         $urls[$filename] = $mainUrl;
         return $urls;
     }
-
     $childPages = cdm_get_child_pages($collection,$pointer);
     if(empty($childPages)) {
         //this means it is a simple object        
@@ -396,6 +365,7 @@ function cdm_get_item_files($collection,$pointer,$filename = false)
         $filename = str_replace('tiff','jpg',$childPage['filename']);
         $filename = str_replace('tif','jpg',$childPage['filename']);
         $filename = str_replace('jp2','jpg',$childPage['filename']);
+        $filename = str_replace('jpeg','jpg',$childPage['filename']);
         $filename = str_replace('png','jpg',$childPage['filename']);
         $filename = str_replace('gif','jpg',$childPage['filename']);
         $filename = str_replace('bmp','jpg',$childPage['filename']);
@@ -403,11 +373,9 @@ function cdm_get_item_files($collection,$pointer,$filename = false)
     }
     return $urls;
 }
-
 function cdm_insert_item_files($item,$collection,$pointer,$filename=false) {
     $urls = cdm_get_item_files($collection,$pointer,$filename);
     $paths = array();
-
     if(get_option('cdmConcatImages')) {
         $pdf = cdm_concat_images($urls,$pointer);
         if($pdf) {
@@ -415,7 +383,6 @@ function cdm_insert_item_files($item,$collection,$pointer,$filename=false) {
             $urls = cdm_get_nonimages($urls);
         }
     }
-
     if(get_option('cdmConcatPdfs')) {
         $pdf = cdm_concat_pdfs($urls,$pointer);
         if($pdf){
@@ -427,54 +394,48 @@ function cdm_insert_item_files($item,$collection,$pointer,$filename=false) {
     foreach ($urls as $filename=>$url) 
         $paths[] = cdm_download_file($url,$filename);
     
-
     if(isset($pdfPath))
         $paths[] = $pdfPath;
-
     if(isset($imagePdfPath))
         array_unshift($paths,$imagePdfPath);
-
     insert_files_for_item($item,'Filesystem',$paths,array('ignore_invalid_files'=>true));
-
     foreach($paths as $path)
         unlink($path);
 }
-
 function cdm_get_file_url($collection,$pointer,$filename=false) {
-
     $url = get_option('cdmServerUrl');
  //    $url .= "/dmwebservices/index.php?q=dmGetImageInfo".$collection."/".$pointer.'/json';
  //JSON version of this API command is mysteriously broken. XML version works fine.
-    $url .= "/dmwebservices/index.php?q=dmGetImageInfo".$collection."/".$pointer.'/xml';
-    $response = file_get_contents($url);
+   	$url .= "/dmwebservices/index.php?q=dmGetImageInfo".$collection."/".$pointer.'/xml';
+	$response = file_get_contents($url);
     
-    $p = xml_parser_create();
-    xml_parse_into_struct($p, $response, $vals, $index);
-    xml_parser_free($p);
-
-    if(isset($index['IMAGEINFO'])) {
-        $width = $vals[$index['WIDTH'][0]]['value'];
-        $height = $vals[$index['HEIGHT'][0]]['value'];
-        $maxWidth = get_option('cdmMaxWidth');
-        if($width > $maxWidth || strpos($vals[$index['FILENAME'][0]]['value'],'jp2')) {
-            if(get_option('cdmLimitImageSize'))
-                $scale = $width > $maxWidth ? floor($maxWidth/$width) : 1;
-            $height = $scale * $height;
-            $width = $scale * $width;
-            $url = get_option('cdmWebsiteUrl');
-            $url .= '/utils/ajaxhelper/?CISOROOT='.$collection.'&CISOPTR='.$pointer.'&action=2&DMX=0&DMY=0&DMWIDTH='.floor($width).'&DMSCALE='.floor($scale*100).'&DMHEIGHT='.floor($height);
-            return $url;
-        }    
-    }
-    
+	$p = xml_parser_create();
+	xml_parse_into_struct($p, $response, $vals, $index);
+	xml_parser_free($p);
+	if(isset($index['IMAGEINFO'])) {
+		$width = $vals[$index['WIDTH'][0]]['value'];
+		$height = $vals[$index['HEIGHT'][0]]['value'];
+		$maxWidth = get_option('cdmMaxWidth');
+	
+		//if($width > $maxWidth || strpos($vals[$index['FILENAME'][0]]['value'],'jp2')) {
+			//if(get_option('cdmLimitImageSize'))
+				// $scale = $width > $maxWidth ? floor($maxWidth/$width) : 1;
+// 			
+// 			$height = $scale * $height;
+// 			$width = $scale * $width;
+// 			$url = get_option('cdmWebsiteUrl');
+// 			$url .= '/utils/ajaxhelper/?CISOROOT='.$collection.'&CISOPTR='.$pointer.'&action=2&DMX=0&DMY=0&DMWIDTH='.floor($width).'&DMSCALE='.floor($scale*100).'&DMHEIGHT='.floor($height);
+// 			return $url;
+// 		}
+	}
+   
     $filename = $filename ? $filename : 'cdm_'.rand();
     $url = get_option('cdmWebsiteUrl');
-    $url .= '/utils/getfile/collection/'.$collection;
+    $url .= '/utils/getfile/collection'.$collection;
     $url .= '/id/'.$pointer;
     $url .= '/filename/'.$filename;
     return $url;
 }
-
 function cdm_sync_item($collection,$pointer,$item_id) {
     $item = get_record_by_id('Item',$item_id);
     $eTexts = get_db()->getTable('ElementText')->findByRecord($item);
@@ -488,7 +449,6 @@ function cdm_sync_item($collection,$pointer,$item_id) {
         if($eSet->name=='Item Type Metadata' && $element->name=='Text')
             $eText->delete();
     }
-
     //delete all files
     $files = $item->getFiles();
     foreach($files as $file) {
@@ -498,14 +458,11 @@ function cdm_sync_item($collection,$pointer,$item_id) {
     //add all the new files and meta to the item
     cdm_add_meta_and_files($item,$collection,$pointer);
 }
-
 function cdm_add_meta_and_files($item,$collection,$pointer) {
     $filename=false;
     $meta = cdm_get_item_meta($collection,$pointer);
-
     foreach($meta as $field=>$values) {
         $field = strpos($field,'-') ? substr($field,0,strpos($field,'-')) : $field ;
-
         $elementTable = get_db()->getTable('Element');
         if($field==='Transcript'){
             $elementSet = 'Item Type Metadata';
@@ -513,20 +470,17 @@ function cdm_add_meta_and_files($item,$collection,$pointer) {
             $documentType = get_db()->getTable('ItemType')->findByName('Document');
             $item->item_type_id = is_object($documentType) ? $documentType->id : null;
             $item->save();
-
         }
         if($field==='URL'){
             $elementSet = 'Item Type Metadata';
             $field = 'URL';
-            $documentType = get_db()->getTable('ItemType')->findByName('Still Image');
+            $documentType = get_db()->getTable('ItemType')->findByName('Artwork');
             $item->item_type_id = is_object($documentType) ? $documentType->id : null;
             $item->save();
-
         }
         else {
             $elementSet = 'Dublin Core';
         }
-
         $element = $elementTable->findbyElementSetNameAndElementName($elementSet,$field);
         if($field === 'filename' && !empty($values))
             $filename = is_array($values) ? $values[0] : $values;
@@ -544,7 +498,6 @@ function cdm_add_meta_and_files($item,$collection,$pointer) {
             $eText->save();
         }
     }
-
     //attach the relevant file(s) to the items
     if($filename){
         // if the filename is already defined from the metadata,
@@ -554,6 +507,7 @@ function cdm_add_meta_and_files($item,$collection,$pointer) {
         $filename = str_replace('tiff','jpg',$filename);
         $filename = str_replace('tif','jpg',$filename);
         $filename = str_replace('jp2','jpg',$filename);
+        $filename = str_replace('jpeg','jpg',$filename);
         $filename = str_replace('png','jpg',$filename);
         $filename = str_replace('gif','jpg',$filename);
         $filename = str_replace('bmp','jpg',$filename);
@@ -564,15 +518,13 @@ function cdm_add_meta_and_files($item,$collection,$pointer) {
         // so we need to gather all the files and insert them
         cdm_insert_item_files($item,$collection,$pointer);
     }
-
     //change item to Image type if it is an image
     if(cdm_is_image($collection,$pointer,$filename)) {
-        $imageType = get_db()->getTable('ItemType')->findByName('Still Image');
+        $imageType = get_db()->getTable('ItemType')->findByName('Artwork');
         $item->item_type_id = is_object($imageType) ? $ImageType->id : null;
         $item->save();
     }
 }
-
 function cdm_get_fields($collection)
 {
     if($collection=='all')
@@ -588,25 +540,20 @@ function cdm_get_fields($collection)
             $rv[$field['nick']]=$field['name'];
     return $rv;
 }
-
 function cdm_get_field_map($collection)
 {
-
     $url = get_option('cdmServerUrl');
     $url .= "/dmwebservices/index.php?q=dmGetDublinCoreFieldInfo/json";
     $dcFields = json_decode(file_get_contents($url),true);
-
     foreach($dcFields as $dcField) {
         $dcmap[$dcField['nick']]=$dcField['name'];
         $fieldmap[$dcField['nick']]=$dcField['name'];
     } 
-
     $url = get_option('cdmServerUrl');
     $url .= "/dmwebservices/index.php?q=dmGetCollectionFieldInfo";
     $url.= $collection;
     $url .= "/json";
     $fields = json_decode(file_get_contents($url),true);
-
     foreach($fields as $field){
         if ($field['dc'] === 'BLANK' || $field['dc']=='') 
             continue;
@@ -615,15 +562,10 @@ function cdm_get_field_map($collection)
     }
     
     return $fieldmap;
-
 }
-
-
 /*
 IDEA: use dmGetCompoundObjectInfo to get compound info (if any) and put it in the structmap field
 Signature
 http://CdmServer.com:port/dmwebservices/index.php?q=dmGetCompoundObjectInfo/alias/pointer/format
-
  */
-
 ?>
