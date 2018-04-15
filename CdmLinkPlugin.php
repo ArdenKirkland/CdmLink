@@ -190,7 +190,9 @@ class CdmLinkPlugin extends Omeka_Plugin_AbstractPlugin
      */
     public function hookDefineAcl($args)
     {
-        $args['acl']->addResource('CdmLink_Index');
+        $acl = $args['acl'];
+        $acl->addResource('CdmLink_Index');
+        $acl->allow(array('contributor','admin','super'), 'CdmLink_Index');
     }
 
     /**
@@ -204,8 +206,7 @@ class CdmLinkPlugin extends Omeka_Plugin_AbstractPlugin
         $nav[] = array(
             'label' => __('Content DM'),
             'uri' => url('cdm-link'),
-            'resource' => 'CdmLink_Index',
-            'privilege' => 'index'
+            'resource' => 'CdmLink_Index'
         );
         return $nav;
     }
