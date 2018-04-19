@@ -561,6 +561,13 @@ function cdm_get_field_map($collection)
         $fieldmap[$field['nick']]=$dc;
     }
     
+    foreach ($fieldmap as $key => $val)
+    {
+        if ($val == 'Format-Extent') $fieldmap[$key] = 'Extent';
+        if ($val == 'Format-Medium') $fieldmap[$key] = 'Medium';
+        if ($val == 'Contributors') $fieldmap[$key] = 'Contributor';
+    }
+    
     return $fieldmap;
 }
 /*
