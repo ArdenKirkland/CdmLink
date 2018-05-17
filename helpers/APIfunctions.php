@@ -186,9 +186,9 @@ function cdm_get_item_meta($collection,$pointer,$all=false,$fields = false,$fiel
         $meta[$fieldmap[$field]][]=$value;
     }
     $meta['Transcript'][]= cdm_get_transcript($collection,$pointer);
-    $meta['Relation'][]= cdm_get_public_url($collection,$pointer);
     $meta['URL'][]= 
     cdm_get_public_url($collection,$pointer);
+    $meta['Relation'][]= cdm_get_public_url($collection,$pointer);
     return $meta;
 }
 function cdm_get_raw_item_meta($collection,$pointer)
@@ -323,6 +323,12 @@ function cdm_is_image($collection,$pointer,$filename = false)
     }
     foreach($childPages as $childPage) {
         if(strpos($childPage['filename'],'jpg'))
+            return true;
+        if(strpos($childPage['filename'],'jpeg'))
+            return true;
+        if(strpos($childPage['filename'],'jp2'))
+            return true;
+        if(strpos($childPage['filename'],'png'))
             return true;
         if(strpos($childPage['filename'],'tiff'))
             return true;
@@ -460,6 +466,11 @@ function cdm_sync_item($collection,$pointer,$item_id) {
 }
 function cdm_add_meta_and_files($item,$collection,$pointer) {
     $filename=false;
+    
+    $imageType = get_db()->getTable('ItemType')->findByName('Artwork');
+    $item->item_type_id = $imageType->id;
+    $item->save();
+    
     $meta = cdm_get_item_meta($collection,$pointer);
     foreach($meta as $field=>$values) {
         $field = strpos($field,'-') ? substr($field,0,strpos($field,'-')) : $field ;
@@ -519,11 +530,16 @@ function cdm_add_meta_and_files($item,$collection,$pointer) {
         cdm_insert_item_files($item,$collection,$pointer);
     }
     //change item to Image type if it is an image
-    if(cdm_is_image($collection,$pointer,$filename)) {
+   /* if(cdm_is_image($collection,$pointer,$filename)) {
         $imageType = get_db()->getTable('ItemType')->findByName('Artwork');
         $item->item_type_id = is_object($imageType) ? $ImageType->id : null;
         $item->save();
-    }
+    } else {
+        $imageType = get_db()->getTable('ItemType')->findByName('Artwork');
+        $item->item_type_id = is_object($imageType) ? $ImageType->id : null;
+        $item->save();
+    }*/
+    $item->save();
 }
 function cdm_get_fields($collection)
 {
